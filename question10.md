@@ -1,5 +1,12 @@
 # Mutator Independence & Heterogeneous Improvement Strategies in `darwinian_evolver`
 
+
+
+## Q10 How does the system's independence of mutator implementations enable it to incorporate heterogeneous improvement strategies? Provide examples of mutators that would have fundamentally different mechanisms.
+
+
+
+
 **Architectural Audit Report — `imbue-ai/darwinian_evolver`**
 *Principal Systems Architect & Evolutionary AI Researcher Perspective*
 
@@ -458,4 +465,3 @@ Because the `Mutator` is generic (`Generic[OrganismT, EvaluationFailureCaseT]`),
 The mutator independence design is an instance of the **Open-Closed Principle** applied to evolutionary computation: the evolver is *closed for modification* (no changes needed to add strategies) but *open for extension* (any strategy expressible as `mutate() → list[Organism]` is a valid plugin). This is what allows the same framework to achieve 95.1% on ARC-AGI-2 with Gemini and 34% with open-weight Kimi K2.5 using entirely different mutation strategies configured at the problem level, without any framework changes.
 
 The deeper insight is that the framework treats mutation strategy selection as a **problem-level concern**, not a framework-level concern. The scientist designing the ARC problem decides to pair a repair mutator with a crossover mutator. The scientist designing the Parrot problem decides a single minimal mutator suffices. The evolver is agnostic. This mirrors the architecture of biological evolution itself: the environment (evaluator) and the replication machinery (mutator) are decoupled, and new replication strategies can emerge without changing the laws of selection.
-

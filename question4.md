@@ -1,5 +1,10 @@
 # Q4 — Why Batching Failures Across Multiple Mutators Outperforms Sending All Failures to a Single Mutator
 
+
+## Q4 Why would providing all failure cases to a single mutator be less effective than batching failures across multiple mutators?
+
+
+
 ## Observation: Failure-Case Routing Is Designed for Multi‑Mutator, Mini‑Batch Style Training
 
 Darwinian Evolver is designed to work from a **sampled failure-case batch per parent** rather than dumping every available failure into one giant mutator prompt. In the actual loop, batch-capable mutators receive that sampled batch, while non-batch mutators receive a single representative failure from it. This still creates a mini‑batch style search process: each call works from focused failure evidence, proposes targeted changes, and the population then selects which proposed children actually improve general fitness.
@@ -23,6 +28,30 @@ This shows that:
 - Failure cases are sampled, not always used en masse.
 - The evolver works from a sampled subset of the failure pool instead of presenting the full failure list to mutators.
 
+Small repo snippet:
+
+```python
+failure_cases = evaluation_result.sample_trainable_failure_cases(batch_size=self._batch_size)
+for mutator in self._mutators:
+    failure_cases_for_mutator = (
+        failure_cases if mutator.supports_batch_mutation else [failure_cases[0]]
+    )
+```
+
+This is the key routing logic in `evolver.py`: the parent first gets one sampled failure batch, and then each mutator receives either that batch or one representative case from it.
+
+Small repo snippet:
+
+```python
+failure_type = random.choices(
+    list(failure_type_frequencies.keys()),
+    weights=list(failure_type_frequencies.values()),
+    k=1,
+)[0]
+```
+
+This comes from `EvaluationResult.sample_trainable_failure_cases(...)` in `problem.py` and shows that the system does not pass all failures by default; it first samples a failure type and then samples a focused batch from that type.
+
 ### Evidence 2 – Mutators Are Independent Consumers of Failure Batches
 
 The research blog describing Darwinian Evolver’s architecture explains that the system supports batch mutations and multiple mutators.
@@ -40,6 +69,19 @@ Taken together:
 
 - There are multiple mutators (standard LLM code mutator, crossover mutator, etc.), each invoked repeatedly.
 - Each mutator call receives the parent’s sampled failure context, with batch-capable mutators seeing the sampled batch and non-batch mutators seeing one focused case, giving multiple, independent mutation attempts per iteration.
+
+Small repo snippet:
+
+```python
+@property
+def supports_batch_mutation(self) -> bool:
+    """
+    If True, the `mutate` method can accept multiple failure cases at once.
+    """
+    return False
+```
+
+This default in `problem.py` is important for the design argument: focused single-failure mutation is the baseline, and batch mutation is an explicit capability that mutators opt into.
 
 The alternative design in the question—"provide all failure cases to a single mutator"—would contradict this architecture and remove most of the benefits of mini‑batching and mutator diversity described in the research docs.
 

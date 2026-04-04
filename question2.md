@@ -1,5 +1,9 @@
 # Q2 — Atomic Population Update: Why All Evaluations Must Complete Before Integration
 
+
+## Q2 Examine the atomic population update strategy where all evaluation results complete before integration. Why is this pattern critical for maintaining statistically valid search dynamics?
+
+
 In Darwinian Evolver, all children generated in an iteration are **evaluated to completion first**, and **only then** are their `(organism, evaluation_result)` pairs integrated into the `Population` in a single batch. This creates an *atomic boundary* between the **parent selection + mutation + evaluation** phase and the **population update** phase. As a result, every mutation in iteration $t$ is sampled from a fixed, snapshot population $P_t$, and the statistics that drive future selection (scores, percentiles, learning logs, novelty counts) are computed on a coherent state $P_t$ before transitioning cleanly to $P_{t+1}$.
 
 ---

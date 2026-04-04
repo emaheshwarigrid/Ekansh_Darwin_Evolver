@@ -1,4 +1,9 @@
 # Batch Size vs Mutation Effectiveness for Failure-Case-Driven Evolution in Darwinian Evolver
+
+
+## Q6 Discuss the trade-off between batch size for failure cases and mutation effectiveness. Why might small batches with focused failures outperform large batches covering all failures simultaneously?
+
+
 ## Overview: How Failure-Case Batch Size Enters the Evolver
 Darwinian Evolver exposes a tunable `batch_size` hyperparameter that controls how many failure cases are supplied to mutators for each parent organism in an iteration. This batch size is realized via per-parent sampling of trainable failure cases and is tracked as an *effective* batch size at runtime through `EvolverStats.effective_batch_size`.
 ## Code Evidence: Tracking Effective Failure-Case Batch Size in EvolverStats

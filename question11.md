@@ -1,8 +1,10 @@
 # Replicator Dynamics and Genetic Lineages in `imbue-ai/darwinian_evolver`
+ 
 
-> **Architectural Audit Question:** Explain the replicator dynamics of the population and how genetic lineages structure problem-solving. Why does tracking parentage (via `_children defaultdict`) enable specific optimization strategies?
 
-***
+## Q11 Explain the replicator dynamics of the population and how genetic lineages structure problem-solving. Why does tracking parentage (via _children defaultdict) enable specific optimization strategies?
+
+
 
 ## 1. Observation: How the Evolutionary Replicator Loop is Implemented
 
@@ -338,4 +340,3 @@ This is architecturally equivalent to **Upper Confidence Bound (UCB)** in multi-
 The bidirectional DAG also enables the `NeighborhoodLearningLogView`'s context assembly to provide the LLM with cross-branch information, giving it visibility into "what was tried nearby and why it failed or succeeded" — a differential signal that directly improves mutation quality per iteration. The lineage graph is thus both the **population memory** and the **exploration policy** of the evolutionary optimizer.
 
 ---
-

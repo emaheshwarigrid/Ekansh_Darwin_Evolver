@@ -1,5 +1,10 @@
 # Why Darwinian Evolver Uses User-Defined Evaluators
 
+
+## Q8 Why does the system require user-defined evaluator functions rather than assuming a fixed evaluation protocol? What generality does this provide?
+
+
+
 ## Overview: Evaluation as a Pluggable, Problem-Specific Component
 
 Darwinian Evolver treats evaluation as a user-supplied component so that the same evolutionary core can optimize prompts, code, agents, or arbitrary text under domain-specific metrics, rather than being hard-wired to a single scoring protocol. The framework only assumes that an evaluator can map an organism to a scalar score and structured failure cases; how that score is computed, which data are used, and what failures mean are entirely up to the integrator. This separation is what allows the authors to describe the system as a “near-universal optimizer” that can operate on “near arbitrary code and text problems” as long as a scoring procedure exists.
@@ -377,4 +382,3 @@ The following ASCII diagram summarizes how user-defined evaluators fit into the 
 In this flow, the evaluators are the only components that know how to run organisms and what constitutes success or failure; all other components treat evaluation as a black box that yields scores and structured failures. This design is what necessitates user-defined evaluator functions and simultaneously grants the framework its broad applicability across diverse optimization problems.
 
 ---
-

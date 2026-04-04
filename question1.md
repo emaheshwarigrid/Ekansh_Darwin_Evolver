@@ -1,5 +1,11 @@
 # Q1 — Why `1/(1 + novelty_weight × num_children)` Solves the Pure-Fitness Exploration Bottleneck
 
+
+## Q1 The Darwinian Evolver uses a weighted sampling parent selection combining sigmoid-scaled performance scores with a novelty bonus calculated as 1/(1 + novelty_weight * num_children). Why does penalizing frequently-used organisms through the 1/num_children term solve a specific exploration bottleneck that a pure fitness-based selection would create?
+
+
+
+
 Penalizing frequently-used parents with the $1/(1 + \text{novelty\_weight} \cdot \text{num\_children})$ factor prevents the search from collapsing onto a few early "lucky" high-fitness organisms. It forces mutation budget to rotate through less-explored lineages while still giving genuinely strong parents elevated, but not unlimited, reproductive opportunities.
 
 ---
@@ -276,4 +282,3 @@ The $1/(1 + \tau \cdot n_i)$ penalty solves the exploration bottleneck of pure f
 2. **Keeping exploration positive:** Weights never reach zero, so every organism always has some chance of being selected, maintaining the diversity of the archive.
 3. **Being history-aware, not just score-aware:** Unlike any static fitness transform, this mechanism encodes *"how much have we already invested here?"* — the exact question that pure fitness selection never asks.
 4. **Costing essentially nothing:** The penalty reads a `len()` of a list that is already maintained for learning logs and lineage visualisation, making it a free exploration mechanism in a system where evaluations are extremely expensive.
-

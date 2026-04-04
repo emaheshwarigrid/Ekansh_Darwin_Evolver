@@ -1,5 +1,11 @@
 # Evaluation Reliability, Population Diversity, and Robust Progress in `imbue-ai/darwinian_evolver`
 
+
+## Q7 Explain the relationship between evaluation reliability and required population diversity. How does the framework maintain progress despite 'noisy evaluators or unreliable mutators'?
+
+
+
+
 ## Observation: Population Sampling and Diversity Mechanisms Under Noisy Evaluation
 
 The framework explicitly claims robustness to "noisy evaluators or unreliable mutators", stating that even if a mutator improves an organism only around 20 percent of the time, the system can still leverage those rare successes to drive progress.
@@ -64,7 +70,7 @@ The novelty bonus decays as the number of children increases, so even moderately
 
 [README.md L116-L132](https://github.com/imbue-ai/darwinian_evolver/blob/4a5597b55634255610e569c9c5bcc34ec9142998/README.md#L116-L132)
 ```markdown
-## Sampling Parameters
+Sampling Parameters
 
 Weighted sampling is used to select a certain number (`--num_parents_per_iteration`) of parent organisms in each iteration. The sampling weight is proportional to the product of two components:
 * the sigmoid-scaled performance score
@@ -201,7 +207,7 @@ This section shows that verification is optional and that, even with verificatio
 
 [README.md L197-L211](https://github.com/imbue-ai/darwinian_evolver/blob/4a5597b55634255610e569c9c5bcc34ec9142998/README.md#L197-L211)
 ```markdown
-### Post-Mutation Verification
+Post-Mutation Verification
 ...
 *Downsides & Limitations:*
 - Can reduce the diversity of organisms in the population and make it harder to escape a local optimum

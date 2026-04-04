@@ -1,5 +1,10 @@
 # Learning Log Observability and Failure Case Tracking in Imbue's Darwinian Evolver (Markdown-Safe Math)
 
+
+## Q5 How does the learning log functionality provide observability into the evolutionary process, and why is explicit failure case tracking essential for understanding mutation effectiveness?
+
+
+
 ## Observation: Learning Log as a Differential Evolution Trace
 
 Imbue's Darwinian Evolver augments the evolutionary loop with a **learning log**: a compact record of past attempted changes together with the observed outcomes of those changes. In the repository, this log is intentionally lightweight. Rather than storing full organism snapshots, raw diffs, or a telemetry table of parent/child metrics, each `LearningLogEntry` contains exactly two pieces of information:

@@ -1,3 +1,11 @@
+# Q9 - Verification, Mutation Validation, and Computational Efficiency
+
+
+
+## Q9 Analyze the relationship between verification (validating mutation structure before evaluation) and computational efficiency. When would skipping verification be a critical optimization?
+
+
+
 Verification in `darwinian_evolver` is an *optional mini‑evaluation gate* that trades extra cheap evaluations on a few failure cases for avoiding many expensive full evaluations, often yielding order‑of‑magnitude compute and cost savings on LLM‑heavy problems.[web:6] Skipping verification becomes a *critical* optimization when verification is itself expensive or uninformative (e.g., noisy evaluators, multi‑step fixes, trivially cheap full evaluations, or early exploratory phases), because in those regimes the verification gate mostly adds latency and cost while harming exploration.[web:4][web:6]  
 
 ---

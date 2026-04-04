@@ -1,5 +1,11 @@
 # WeightedSamplingPopulation vs FixedTreePopulation: Architectural Audit
 
+
+## Q3 Compare WeightedSamplingPopulation and FixedTreePopulation strategies and explain why each is optimal for different problem classes.
+
+
+
+
 **Repository:** `imbue-ai/darwinian_evolver` | **Audited by:** Ekansh Maheshwari
 
 ---
@@ -238,8 +244,6 @@ The `problems/` folder contains six files. The four runnable problems split even
 | `circle_packing.py` | Python code for geometric circle packing | Continuous sum of radii — **truly continuous, deterministic** | **None** — pure math, no randomness | **WeightedSampling** ✓ | Continuous, noise-free score makes sigmoid weighting highly meaningful. The 30-minute per-evaluation timeout makes it critical to focus compute only on high-scoring organisms. FixedTree would waste expensive slots on poor performers. |
 | `multiplication_verifier.py` | Prompt to classify multiplication results | Accuracy % over a test set — near-binary per sample | **Medium** — LLM re-runs can yield different verdicts | **FixedTree** ✓ | Noisy LLM evaluator means an organism could score high on one run by luck. Weighted selection would over-promote that organism, monopolising future mutations. FixedTree prevents a single noisy high-scorer from crowding out alternatives. |
 | `arc_agi.py` | Python code solver for ARC-AGI grid tasks | Multi-component composite: correctness + transfer + simplicity | **High** — multiple expensive LLM judges, each can vary | **WeightedSampling** ✓ (strongly) | Despite high noise, the composite score meaningfully distinguishes strong from weak solvers over many tasks. Adaptive allocation is essential when each evaluation costs significant API budget across three separate judge dimensions. |
-| `arc_agi_poetiq.py` *(assumed)* | **Assumption:** If evolved as a standalone problem, this module would optimize the **soft scoring function and prompt templates** for ARC grid evaluation — i.e., evolve `soft_score()` to better correlate with human judgments of task correctness | Continuous correlation score between predicted grid similarity and ground-truth human ratings — **continuous, meaningful gradient** | **Low-Medium** — correlation is deterministic given fixed data, but the ground-truth dataset itself introduces variance | **WeightedSampling** *(assumed)* | **Assumption basis:** The `soft_score` function returns a float in [0, 1] via element-wise array comparison — a continuous, differentiable signal that improves gradually as the scoring formula is refined. This matches WeightedSampling's strength. FixedTree would be wasteful because the score gradient is real and informative even for small improvements in formula quality. |
-| `registry.py` *(assumed)* | **Assumption:** If evolved as a standalone problem, the registry would optimize **problem routing and selection composition** — i.e., which problems to include, their weighting, and how to compose multi-problem evaluation pipelines | Binary per-problem inclusion/exclusion — a discrete combinatorial signal (problem A works in the pipeline or it doesn't) | **High** — meta-level evaluation across multiple problem types introduces compound noise from each sub-evaluator | **FixedTree** *(assumed)* | **Assumption basis:** Evolving a registry is fundamentally a combinatorial search over a discrete set of options (include/exclude problems, reorder them). With binary inclusion decisions and compounded evaluator noise, sigmoid weighting on a composite meta-score would be unreliable. FixedTree's equal branching systematically covers the combinatorial space depth-first without premature commitment to a noisy early winner. |
 
 **Key pattern:** FixedTree wins when the score is near-binary or evaluator noise is high enough to make weighting misleading. WeightedSampling wins when the score is continuous, reliable, and expensive-to-compute — conditions where adaptive allocation has genuine leverage.
 
