@@ -146,23 +146,23 @@ $$
 Assume the evolver uses a sigmoid-based sampling weight for selection of the form
 
 $$
-w(o) = \operatorname{sigmoid}(\lambda \cdot (f(o) - m)),
+w(o) = \sigma(\lambda \cdot (f(o) - m)),
 $$
 
 where
 
 $$
-\operatorname{sigmoid}(z) = \frac{1}{1 + \exp(-z)}.
+\sigma(z) = \frac{1}{1 + \exp(-z)}.
 $$
 
 With $m = 0.60$ and $\lambda = 10$:
 
 $$
-w(o_p) = \operatorname{sigmoid}(10 \cdot (0.60 - 0.60)) = 0.5
+w(o_p) = \sigma(10 \cdot (0.60 - 0.60)) = 0.5
 $$
 
 $$
-w(o_c) = \operatorname{sigmoid}(10 \cdot (0.63 - 0.60)) = \operatorname{sigmoid}(0.3) \approx 0.5744
+w(o_c) = \sigma(10 \cdot (0.63 - 0.60)) = \sigma(0.3) \approx 0.5744
 $$
 
 If the population temporarily contained only these two organisms, their normalized selection probabilities would be:

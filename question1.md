@@ -6,7 +6,7 @@
 
 
 
-Penalizing frequently-used parents with the $1/(1 + \text{novelty\_weight} \cdot \text{num\_children})$ factor prevents the search from collapsing onto a few early "lucky" high-fitness organisms. It forces mutation budget to rotate through less-explored lineages while still giving genuinely strong parents elevated, but not unlimited, reproductive opportunities.
+Penalizing frequently-used parents with the $1/(1 + \tau n)$ factor prevents the search from collapsing onto a few early "lucky" high-fitness organisms. Here, $\tau$ denotes the novelty weight and $n$ denotes the number of children. It forces mutation budget to rotate through less-explored lineages while still giving genuinely strong parents elevated, but not unlimited, reproductive opportunities.
 
 ---
 

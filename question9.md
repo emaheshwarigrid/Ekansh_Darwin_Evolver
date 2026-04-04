@@ -6,15 +6,15 @@
 
 
 
-Verification in `darwinian_evolver` is an *optional mini‑evaluation gate* that trades extra cheap evaluations on a few failure cases for avoiding many expensive full evaluations, often yielding order‑of‑magnitude compute and cost savings on LLM‑heavy problems.[web:6] Skipping verification becomes a *critical* optimization when verification is itself expensive or uninformative (e.g., noisy evaluators, multi‑step fixes, trivially cheap full evaluations, or early exploratory phases), because in those regimes the verification gate mostly adds latency and cost while harming exploration.[web:4][web:6]  
+Verification in `darwinian_evolver` is an *optional mini‑evaluation gate* that trades extra cheap evaluations on a few failure cases for avoiding many expensive full evaluations, often yielding order‑of‑magnitude compute and cost savings on LLM‑heavy problems. Skipping verification becomes a *critical* optimization when verification is itself expensive or uninformative (e.g., noisy evaluators, multi‑step fixes, trivially cheap full evaluations, or early exploratory phases), because in those regimes the verification gate mostly adds latency and cost while harming exploration.  
 
 ---
 
 ## Observation: Optional Post‑Mutation Verification as a Mini‑Evaluator
 
-The core loop is: sample parents → mutate via LLM → optionally verify each mutation on a small set of failure cases → fully evaluate successful mutations → update population.[web:4][web:6][web:13]  
+The core loop is: sample parents → mutate via LLM → optionally verify each mutation on a small set of failure cases → fully evaluate successful mutations → update population.  
 
-Post‑mutation verification is explicitly described as an *optional* step, intended to “filter out mutations that are unlikely to yield improvements before conducting a full dataset evaluation, potentially saving both time and costs,” with reported “time and cost efficiencies improving by over tenfold” in Imbue’s experiments when this filter is predictive.[web:6]  
+Post‑mutation verification is explicitly described as an *optional* step, intended to “filter out mutations that are unlikely to yield improvements before conducting a full dataset evaluation, potentially saving both time and costs,” with reported “time and cost efficiencies improving by over tenfold” in Imbue’s experiments when this filter is predictive.  
 
 ---
 
@@ -206,29 +206,29 @@ Key points:
 - It returns `True` as soon as *one* previous failure disappears.  
 - The comment explicitly acknowledges that verification is imperfect due to LLM randomness—an important caveat for when verification may hurt search rather than help.  
 
-In the multiplication verifier, evaluation and verification both cost LLM calls, but full evaluation costs $20$ calls, while verification costs at most $|\text{from\_failure\_cases}|$, which is typically much smaller; that is precisely the efficiency lever.  
+In the multiplication verifier, evaluation and verification both cost LLM calls, but full evaluation costs $20$ calls, while verification costs at most $|F|$, where $F$ is the mutation's originating failure-case set; that is typically much smaller, and that is precisely the efficiency lever.  
 
 ---
 
 ## Design Reasoning: Why Post‑Mutation Verification Improves Efficiency
 
-The Imbue research post frames post‑mutation verification as a way to “filter out mutations that are unlikely to yield improvements before conducting a full dataset evaluation,” reporting more than 10× time and cost savings when using mini‑evaluations on failure cases as a predictor of overall improvement.[web:6]  
+The Imbue research post frames post‑mutation verification as a way to “filter out mutations that are unlikely to yield improvements before conducting a full dataset evaluation,” reporting more than 10× time and cost savings when using mini‑evaluations on failure cases as a predictor of overall improvement.  
 
 From an evolutionary‑systems perspective:  
 
 - **Expensive evaluator, cheap verifier**:  
-  - *Evaluator* compares an organism against a large dataset or many ARC‑AGI tasks, often involving dozens or hundreds of LLM calls, plus scoring logic.[web:4][web:11]  
+  - *Evaluator* compares an organism against a large dataset or many ARC‑AGI tasks, often involving dozens or hundreds of LLM calls, plus scoring logic.  
   - *Verifier* re‑checks only the local neighborhood of failure cases that were given to the mutator. This is a small, targeted subset, often a low constant factor relative to the full dataset.  
 
 - **Selection pressure vs. exploration**:  
-  - Verification introduces an additional selection bottleneck: only organisms that immediately improve on some known failure cases are allowed to incur the expensive full evaluation and enter the population.[web:4][web:6]  
+  - Verification introduces an additional selection bottleneck: only organisms that immediately improve on some known failure cases are allowed to incur the expensive full evaluation and enter the population.  
   - This can massively reduce the number of wasteful evaluations on clearly bad or neutral mutations, tightening the distribution of evaluated organisms around promising regions of the search space.  
 
 - **Concurrency and resource utilization**:  
-  - The evolver runs mutators and evaluators in thread or process pools; each full evaluation may block a worker on LLM calls for seconds.[web:4][web:6][web:13]  
+  - The evolver runs mutators and evaluators in thread or process pools; each full evaluation may block a worker on LLM calls for seconds.  
   - Verification shifts work from “long” jobs (full evaluations) to “short” ones (mini‑evals on a few data points). Since the evaluator pool is shared, verification is essentially an early‑exit mechanism that keeps the pool from being saturated with hopeless candidates.  
 
-The README emphasizes that verification “can significantly reduce the number of full evaluations that need to be performed, which is especially useful if full evaluations are slow and/or costly,” but warns of reduced diversity and over‑fitting risk when evaluation is noisy or when failures require multi‑step fixes.[web:4] Those warnings are exactly the regimes where *skipping* verification can become the better efficiency choice.  
+The README emphasizes that verification “can significantly reduce the number of full evaluations that need to be performed, which is especially useful if full evaluations are slow and/or costly,” but warns of reduced diversity and over‑fitting risk when evaluation is noisy or when failures require multi‑step fixes. Those warnings are exactly the regimes where *skipping* verification can become the better efficiency choice.  
 
 ---
 
@@ -290,7 +290,7 @@ Ratio:
 $$
 \frac{C_{\text{ver}}}{C_{\text{no-ver}}} = \frac{0.008}{0.02} = 0.4
 $$
-You save 60% of evaluation cost, i.e., a ~2.5× speedup. In practice, Imbue reports *over 10×* improvements on some problems, meaning their $C_{\text{ver}}$ was tiny and $p$ was low (many bad mutations filtered) relative to the cost of full evaluation.[web:6]  
+You save 60% of evaluation cost, i.e., a ~2.5× speedup. In practice, Imbue reports *over 10×* improvements on some problems, meaning their $C_{\text{ver}}$ was tiny and $p$ was low (many bad mutations filtered) relative to the cost of full evaluation.  
 
 Now flip the regime: suppose evaluation is *very cheap* but verification is almost as expensive:  
 
@@ -323,7 +323,7 @@ When full evaluation is already inexpensive (e.g., fast CPU‑only checks, small
 
 ### 2. Highly Noisy Evaluators (LLM Instability, Stochastic Tasks)
 
-The README explicitly warns that verification “requires that evaluation results on a given data point are (mostly) consistent across runs. If the evaluation results on a given data point have high variance, then verification results cease to be indicative of a mutation’s true performance characteristics.”[web:4]  
+The README explicitly warns that verification “requires that evaluation results on a given data point are (mostly) consistent across runs. If the evaluation results on a given data point have high variance, then verification results cease to be indicative of a mutation’s true performance characteristics.”  
 
 - In such noisy regimes, a mutation may appear to “fail verification” solely due to evaluator randomness, even if it would improve the full score on average.  
 - This causes the verification filter to discard potentially good stepping stone organisms, wasting the computational effort spent mutating and verifying them, and anyway forcing you to run many more iterations to achieve the same progress.  
@@ -331,7 +331,7 @@ The README explicitly warns that verification “requires that evaluation result
 
 ### 3. Multi‑Step Fixes Where Single Mutations Cannot Resolve Failures
 
-The README notes that verification “requires that a single mutation step can plausibly remove a given failure case,” and warns that when problems “require a sequence of mutations before a given failure case is fully resolved, post‑mutation verification can stop those problems from making any progress.”[web:4]  
+The README notes that verification “requires that a single mutation step can plausibly remove a given failure case,” and warns that when problems “require a sequence of mutations before a given failure case is fully resolved, post‑mutation verification can stop those problems from making any progress.”  
 
 - In such landscapes, early mutations may be *directionally useful* but not yet sufficient to fix any specific failure case.  
 - Verification would mark these as failures and discard them, preventing the search from traversing the necessary intermediate genotypes.  
@@ -341,7 +341,7 @@ From an efficiency standpoint, this is subtle: the verification gate throws away
 
 ### 4. Early‑Phase Exploration and Diversity‑Sensitive Regimes
 
-Verification is a strong local filter that heavily biases toward “fix the known failures right now.” While that’s great for exploitation, it can be counterproductive during early exploration, where you want diversity, novelty, and broad coverage. The README warns that verification “can reduce the diversity of organisms in the population and make it harder to escape a local optimum.”[web:4]  
+Verification is a strong local filter that heavily biases toward “fix the known failures right now.” While that’s great for exploitation, it can be counterproductive during early exploration, where you want diversity, novelty, and broad coverage. The README warns that verification “can reduce the diversity of organisms in the population and make it harder to escape a local optimum.”  
 
 Situations where skipping verification is especially important:  
 
@@ -364,7 +364,7 @@ Because verification runs in the same evaluator executor pool as full evaluation
 Putting it together in the cost model and the code:  
 
 - Verification adds a per‑mutation overhead $C_{\text{ver}}$ but reduces the expected number of full evaluations from $M$ to $pM$.  
-- When $C_{\text{ver}}$ is tiny and $p$ is small, verification yields huge savings; this is the regime Imbue emphasizes (LLM‑heavy evaluators on ARC‑AGI tasks).[web:6][web:11]  
+- When $C_{\text{ver}}$ is tiny and $p$ is small, verification yields huge savings; this is the regime Imbue emphasizes (LLM‑heavy evaluators on ARC‑AGI tasks).  
 - When either:  
   - $C_{\text{ver}} \approx C_{\text{eval}}$ (e.g., both are LLM‑heavy),  
   - or $p$ is large (most mutations pass verification),  
@@ -443,7 +443,7 @@ In those non‑ideal regimes, the code already lets you turn verification off vi
 
 ## System Design Insight: Why It’s Architected This Way
 
-Imbue’s Evolver is intended as a *universal optimizer* for any code/text problem where evaluation can be expensive and noisy.[web:4][web:6][web:8] That leads to several architectural constraints that explain this design:  
+Imbue’s Evolver is intended as a *universal optimizer* for any code/text problem where evaluation can be expensive and noisy. That leads to several architectural constraints that explain this design:  
 
 1. **Problem‑Agnostic Efficiency Lever**  
    - Different problems have wildly different evaluator costs and noise profiles.  
@@ -453,14 +453,14 @@ Imbue’s Evolver is intended as a *universal optimizer* for any code/text probl
 
 2. **Decoupling Search Policy from Evaluation Semantics**  
    - `Evolver` treats verification as a binary gating function returning `(organism, bool)` and doesn’t care *how* that bool is computed.  
-   - This keeps the core evolutionary logic independent of the domain while still enabling sophisticated cost‑saving strategies such as LLM mini‑evals on failure cases.[web:6]  
+   - This keeps the core evolutionary logic independent of the domain while still enabling sophisticated cost‑saving strategies such as LLM mini‑evals on failure cases.  
 
 3. **Concurrency‑Friendly Early Filtering**  
    - The use of thread/process pools for both mutators and evaluators allows the system to pipeline LLM calls, but the real bottleneck is typically evaluator capacity.  
    - By running verification in the evaluator pool and using it to cut off many candidates early, they keep the pool focused on promising organisms when evaluation is expensive, while still allowing you to disable verification entirely when evaluation is cheap or you need maximum diversity.  
 
 4. **Explicit Acknowledgment of Noisy/Non‑Local Fitness**  
-   - The multiplication verifier’s comment about LLM randomness, and the README’s caution on high‑variance data and multi‑step fixes, show that the authors *expect* regimes where verification is not reliable.[web:4]  
+   - The multiplication verifier’s comment about LLM randomness, and the README’s caution on high‑variance data and multi‑step fixes, show that the authors *expect* regimes where verification is not reliable.  
    - Rather than forcing verification as a hard requirement, the framework exposes a simple switch (`--verify_mutations`) and problem‑side implementation hook so practitioners can *opt out* whenever verification harms progress or efficiency.  
 
-In short: **verification is a powerful but situational efficiency tool**, architected as an optional, problem‑defined mini‑evaluator. It offers huge compute savings when full evaluations are heavy and relatively stable, but the framework is intentionally designed so that *skipping* verification is easy and, in many real problems (cheap tests, noisy LLM evaluators, or multi‑step failures), is the crucial optimization for both computational efficiency and evolutionary progress.[web:4][web:6][web:13]
+In short: **verification is a powerful but situational efficiency tool**, architected as an optional, problem‑defined mini‑evaluator. It offers huge compute savings when full evaluations are heavy and relatively stable, but the framework is intentionally designed so that *skipping* verification is easy and, in many real problems (cheap tests, noisy LLM evaluators, or multi‑step failures), is the crucial optimization for both computational efficiency and evolutionary progress.
