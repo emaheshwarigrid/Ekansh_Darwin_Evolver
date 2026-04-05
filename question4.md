@@ -28,7 +28,7 @@ This shows that:
 - Failure cases are sampled, not always used en masse.
 - The evolver works from a sampled subset of the failure pool instead of presenting the full failure list to mutators.
 
-Small repo snippet:
+[evolver.py L132-L141](https://github.com/imbue-ai/darwinian_evolver/blob/main/darwinian_evolver/evolver.py#L132-L141)
 
 ```python
 failure_cases = evaluation_result.sample_trainable_failure_cases(batch_size=self._batch_size)
@@ -40,7 +40,7 @@ for mutator in self._mutators:
 
 This is the key routing logic in `evolver.py`: the parent first gets one sampled failure batch, and then each mutator receives either that batch or one representative case from it.
 
-Small repo snippet:
+[problem.py L140-LL144](https://github.com/imbue-ai/darwinian_evolver/blob/main/darwinian_evolver/problem.py/#L140-L144)
 
 ```python
 failure_type = random.choices(
@@ -70,7 +70,7 @@ Taken together:
 - There are multiple mutators (standard LLM code mutator, crossover mutator, etc.), each invoked repeatedly.
 - Each mutator call receives the parent’s sampled failure context, with batch-capable mutators seeing the sampled batch and non-batch mutators seeing one focused case, giving multiple, independent mutation attempts per iteration.
 
-Small repo snippet:
+[problem.py L203-L210](https://github.com/imbue-ai/darwinian_evolver/blob/main/darwinian_evolver/problem.py#L203-L210)
 
 ```python
 @property
